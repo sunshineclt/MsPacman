@@ -68,9 +68,9 @@ class DQN:
 		self.saver = tf.train.Saver()
 		self.session = tf.InteractiveSession()
 		self.session.run(tf.initialize_all_variables())
-		checkpoint = tf.train.get_checkpoint_state("saved_networks")
+		checkpoint = tf.train.get_checkpoint_state("saved-networks")
 		if checkpoint and checkpoint.model_checkpoint_path:
-			saver.restore(self.session, checkpoint.model_checkpoint_path)
+			self.saver.restore(self.session, checkpoint.model_checkpoint_path)
 			print "Successfully loaded:", checkpoint.model_checkpoint_path
 		else:
 			print "Could not find old network weights"
