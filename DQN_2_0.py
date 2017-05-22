@@ -160,9 +160,7 @@ def print_ob(ob):
 def preprocess(observation):
 	observation = observation[0:160]
 	observation = cv2.cvtColor(cv2.resize(observation, (160, 160)), cv2.COLOR_BGR2GRAY)
-	#ret, observation = cv2.threshold(observation, 1, 255, cv2.THRESH_BINARY)
 	ob = np.reshape(observation, (160, 160, 1))
-	#print_ob(ob)
 	return ob
 
 def process_action(action):
@@ -177,7 +175,6 @@ def main():
 	observation0 = observation0[0:160]
 	observation0 = cv2.cvtColor(cv2.resize(observation0, (160, 160)), cv2.COLOR_BGR2GRAY)
 	agent.set_init_state(observation0)
-    # Step 3.2: run the game
 	while True:
 		action = agent.getAction()
 		nextObservation,reward,terminal, info = env.step(action)
