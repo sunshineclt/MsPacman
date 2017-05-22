@@ -183,38 +183,5 @@ def main():
 		nextObservation,reward,terminal, info = env.step(action)
 		nextObservation = preprocess(nextObservation)
 		agent.setPerception(nextObservation,process_action(action),reward,terminal)
-	'''
-	for episode in xrange(EPISODE):
-		# initialiaze task
-		state = env.reset()
-		#Train
-		sum_reward = 0
-		for step in xrange(STEP):
-			action = agent.getAction(preprocess(state)) # e-greedy action for train
-			next_state, reward, done, info = env.step(action)
-			# Define reward for agent
-			agent.perceive(preprocess(next_state), action, reward, done)
-			if done:
-				break
-		# Test every 100 episodes
-		
-		if episode % 100 == 0:
-			total_reward = 0
-			for i in xrange(TEST):
-				state = env.reset()	
-				print 'i:', i
-				for j in xrange(STEP):
-					print 'j:', j
-					env.render()
-					state_flat = flatten(state.tolist())
-					action = agent.action(state_flat) # direct action for test
-					state, reward, done, _ = env.step(action)
-					total_reward += reward
-					if done:
-						break
-			ave_reward = total_reward / TEST
-			print 'episode', episode, 'Evaluation Average Reward:', ave_reward
-			if ave_reward >= 200:
-				break		
-		'''
+
 main()
