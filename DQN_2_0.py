@@ -163,7 +163,10 @@ def preprocess(observation):
 	observation = observation[0:160]
 	observation = cv2.cvtColor(cv2.resize(observation, (160, 160)), cv2.COLOR_BGR2GRAY)
 	ob = np.reshape(observation, (160, 160, 1))
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
 	return ob
 
 def process_action(action):
@@ -178,11 +181,18 @@ def main():
 	observation0 = observation0[0:160]
 	observation0 = cv2.cvtColor(cv2.resize(observation0, (160, 160)), cv2.COLOR_BGR2GRAY)
 	agent.set_init_state(observation0)
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
 	while True:
 		action = agent.getAction()
 		nextObservation,reward,terminal, info = env.step(action)
 		nextObservation = preprocess(nextObservation)
 		agent.setPerception(nextObservation,process_action(action),reward,terminal)
 
+<<<<<<< HEAD
 main()
+=======
+main()
+>>>>>>> origin/master
