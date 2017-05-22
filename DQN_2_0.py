@@ -68,9 +68,9 @@ class DQN:
 		self.saver = tf.train.Saver()
 		self.session = tf.InteractiveSession()
 		self.session.run(tf.initialize_all_variables())
-		checkpoint = tf.train.get_checkpoint_state("saved_networks")
+		checkpoint = tf.train.get_checkpoint_state("saved-networks")
 		if checkpoint and checkpoint.model_checkpoint_path:
-			saver.restore(self.session, checkpoint.model_checkpoint_path)
+			self.saver.restore(self.session, checkpoint.model_checkpoint_path)
 			print "Successfully loaded:", checkpoint.model_checkpoint_path
 		else:
 			print "Could not find old network weights"
@@ -100,7 +100,9 @@ class DQN:
 			})
 
         # save network every 10000 iteration
-		#print self.time_step
+		if self.time_step % 100 == 0:
+			print self.time_step
+
 		if self.time_step % 10000 == 0:
 			print "save", self.time_step
 			self.saver.save(self.session, 'saved-networks/' + 'dqn', global_step = self.time_step)
@@ -160,9 +162,8 @@ def print_ob(ob):
 def preprocess(observation):
 	observation = observation[0:160]
 	observation = cv2.cvtColor(cv2.resize(observation, (160, 160)), cv2.COLOR_BGR2GRAY)
-	#ret, observation = cv2.threshold(observation, 1, 255, cv2.THRESH_BINARY)
 	ob = np.reshape(observation, (160, 160, 1))
-	#print_ob(ob)
+
 	return ob
 
 def process_action(action):
@@ -177,44 +178,11 @@ def main():
 	observation0 = observation0[0:160]
 	observation0 = cv2.cvtColor(cv2.resize(observation0, (160, 160)), cv2.COLOR_BGR2GRAY)
 	agent.set_init_state(observation0)
-    # Step 3.2: run the game
+
 	while True:
 		action = agent.getAction()
 		nextObservation,reward,terminal, info = env.step(action)
 		nextObservation = preprocess(nextObservation)
 		agent.setPerception(nextObservation,process_action(action),reward,terminal)
-	'''
-	for episode in xrange(EPISODE):
-		# initialiaze task
-		state = env.reset()
-		#Train
-		sum_reward = 0
-		for step in xrange(STEP):
-			action = agent.getAction(preprocess(state)) # e-greedy action for train
-			next_state, reward, done, info = env.step(action)
-			# Define reward for agent
-			agent.perceive(preprocess(next_state), action, reward, done)
-			if done:
-				break
-		# Test every 100 episodes
-		
-		if episode % 100 == 0:
-			total_reward = 0
-			for i in xrange(TEST):
-				state = env.reset()	
-				print 'i:', i
-				for j in xrange(STEP):
-					print 'j:', j
-					env.render()
-					state_flat = flatten(state.tolist())
-					action = agent.action(state_flat) # direct action for test
-					state, reward, done, _ = env.step(action)
-					total_reward += reward
-					if done:
-						break
-			ave_reward = total_reward / TEST
-			print 'episode', episode, 'Evaluation Average Reward:', ave_reward
-			if ave_reward >= 200:
-				break		
-		'''
+
 main()
