@@ -15,7 +15,7 @@ class DQN:
 	EXPLORE = 15000
 	FINAL_EPSILON = 0.1
 	INITIAL_EPSILON = 1.0
-	REPLAY_MEMORY = 60000
+	REPLAY_MEMORY = 50000
 	BATCH_SIZE = 32 # size of minibatch
 
 	def __init__(self):
@@ -102,22 +102,22 @@ class DQN:
         # save network every 10000 iteration
 		if self.time_step % 100 == 0:
 			print self.time_step
-			print self.epsilon
 
 		if self.time_step % 10000 == 0:
 			print "save", self.time_step
 			self.saver.save(self.session, 'saved-networks/' + 'dqn', global_step = self.time_step)
 
 
-	def setPerception(self,nextObservation,action,reward,terminal):
+	def setPerception(self,nextObservation):
 		new_state = np.append(nextObservation,self.current_state[:,:,1:],axis = 2)
+		'''
 		self.replay_memory.append((self.current_state,action,reward,new_state,terminal))
 		if len(self.replay_memory) > self.REPLAY_MEMORY:
 			self.replay_memory.popleft()
 		if self.time_step > self.OBSERVE:
             # Train the network
 			self.train_Q_Network()
-
+		'''
 		self.current_state = new_state
 		self.time_step += 1
 
@@ -126,15 +126,9 @@ class DQN:
 			self.state_input:[self.current_state]
 			})[0]
 		action = np.zeros(self.ACTION)
-		action_index = 0
+		action_index = random.randrange(self.ACTION)
 		if self.time_step % self.FRAME_PER_ACTION == 0:
-			if random.random() <= self.epsilon:
-				action_index = random.randrange(self.ACTION)
-			else:
 				action_index = np.argmax(Q_value)
-
-		if self.epsilon > self.FINAL_EPSILON and self.time_step > self.OBSERVE:
-			self.epsilon -= (self.epsilon - self.FINAL_EPSILON) /  self.EXPLORE
 
 		return action_index
 
@@ -161,7 +155,7 @@ def print_ob(ob):
 			print ob[i][j]
 
 def preprocess(observation):
-	observation = observation[0:180]
+	observation = observation[0:160]
 	observation = cv2.cvtColor(cv2.resize(observation, (160, 160)), cv2.COLOR_BGR2GRAY)
 	ob = np.reshape(observation, (160, 160, 1))
 
@@ -175,16 +169,19 @@ def process_action(action):
 def main():
 	env = gym.make('MsPacman-v0')
 	agent = DQN()
-	observation0 = env.reset()
-	observation0 = observation0[0:180]
-	observation0 = cv2.cvtColor(cv2.resize(observation0, (160, 160)), cv2.COLOR_BGR2GRAY)
-	agent.set_init_state(observation0)
 
-	while True:
-		action = agent.getAction()
-		nextObservation,reward,terminal, info = env.step(action)
-		nextObservation = preprocess(nextObservation)
-		agent.setPerception(nextObservation,process_action(action),reward,terminal)
+	for i in range(20):
+		observation0 = env.reset()
+		observation0 = observation0[0:160]
+		observation0 = cv2.cvtColor(cv2.resize(observation0, (160, 160)), cv2.COLOR_BGR2GRAY)
+		agent.set_init_state(observation0)
+		for step in range(10000):
+			env.render()
+			action = agent.getAction()
+			ob, reward, done, info = env.step(action)
+			agent.setPerception(preprocess(ob))
+			if done:
+				print("Episode finished after {} timesteps".format(step+1))
+				break
 
 main()
-
