@@ -15,7 +15,7 @@ class DQN:
 	EXPLORE = 15000
 	FINAL_EPSILON = 0.1
 	INITIAL_EPSILON = 1.0
-	REPLAY_MEMORY = 50000
+	REPLAY_MEMORY = 60000
 	BATCH_SIZE = 32 # size of minibatch
 
 	def __init__(self):
@@ -102,6 +102,7 @@ class DQN:
         # save network every 10000 iteration
 		if self.time_step % 100 == 0:
 			print self.time_step
+			print self.epsilon
 
 		if self.time_step % 10000 == 0:
 			print "save", self.time_step
@@ -133,7 +134,7 @@ class DQN:
 				action_index = np.argmax(Q_value)
 
 		if self.epsilon > self.FINAL_EPSILON and self.time_step > self.OBSERVE:
-			self.epsilon -= (self.INITIAL_EPSILON - self.FINAL_EPSILON) /  self.EXPLORE
+			self.epsilon -= (self.epsilon - self.FINAL_EPSILON) /  self.EXPLORE
 
 		return action_index
 
@@ -160,7 +161,7 @@ def print_ob(ob):
 			print ob[i][j]
 
 def preprocess(observation):
-	observation = observation[0:160]
+	observation = observation[0:180]
 	observation = cv2.cvtColor(cv2.resize(observation, (160, 160)), cv2.COLOR_BGR2GRAY)
 	ob = np.reshape(observation, (160, 160, 1))
 
@@ -175,7 +176,7 @@ def main():
 	env = gym.make('MsPacman-v0')
 	agent = DQN()
 	observation0 = env.reset()
-	observation0 = observation0[0:160]
+	observation0 = observation0[0:180]
 	observation0 = cv2.cvtColor(cv2.resize(observation0, (160, 160)), cv2.COLOR_BGR2GRAY)
 	agent.set_init_state(observation0)
 
